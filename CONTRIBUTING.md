@@ -288,6 +288,15 @@ When you change the shared MCP setup:
     cp .env.dev.example .env
    ```
 
+   If a port the dev stack needs is already in use on your machine (for example a local Postgres on 5432 or another app on 3000):
+   - Docker services: uncomment the matching variable at the top of `.env` (for example `POSTGRES_HOST_PORT=5433`), then update the settings that point at that port, since they are not derived from it: `DATABASE_URL` and `DIRECT_URL` (Postgres), `REDIS_PORT` (Redis), `CLICKHOUSE_URL` and `CLICKHOUSE_MIGRATION_URL` (ClickHouse), and the `LANGFUSE_S3_*_ENDPOINT` values (MinIO).
+   - Web app: do not set `PORT` in `.env`. The worker reads the same file and would try to bind that port too. Set `NEXTAUTH_URL` in `.env` to the new port, and pass `PORT` to the web app only. Run each command in its own terminal:
+
+     ```bash
+     PORT=3100 pnpm run dev:web
+     pnpm run dev:worker
+     ```
+
 5. Run the entire infrastructure in dev mode. **Note**: if you have an existing database, this command wipes it. Also, this will fail on the very first run. Please run it again.
 
    ```bash
